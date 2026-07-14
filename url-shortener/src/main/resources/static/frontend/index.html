@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #1976d2;
+            color: white;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #1565c0;
+        }
+
+        .card {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #fafafa;
+            border: 1px solid #ddd;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result a {
+            color: #1976d2;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .result a:hover {
+            text-decoration: underline;
+        }
+
+        .stats {
+            margin-top: 15px;
+        }
+
+        .stats button {
+            margin-top: 10px;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .stats-card {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f5f7fa;
+            border: 1px solid #dcdcdc;
+        }
+
+        .stats-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .stats-card p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>URL Shortener</h1>
+
+    <div class="input-group">
+        <input
+                type="url"
+                id="urlInput"
+                placeholder="Введите длинную ссылку">
+        <button id="shortenBtn">Сократить</button>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div id="resultCard" class="card hidden">
+
+        <div class="result">
+            <strong>Короткая ссылка:</strong><br><br>
+
+            <a id="shortLink"
+               href="#"
+               target="_blank"></a>
+        </div>
+
+        <div class="stats">
+
+            <button id="statsBtn">
+                Получить статистику
+            </button>
+
+            <div id="statsResult"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    const API = "http://localhost:8080/api/links";
+
+    const urlInput = document.getElementById("urlInput");
+    const shortenBtn = document.getElementById("shortenBtn");
+
+    const resultCard = document.getElementById("resultCard");
+    const shortLink = document.getElementById("shortLink");
+
+    const statsBtn = document.getElementById("statsBtn");
+    const statsResult = document.getElementById("statsResult");
+
+    const error = document.getElementById("error");
+
+    let currentShortCode = "";
+
+    shortenBtn.addEventListener("click", shortenUrl);
+
+    statsBtn.addEventListener("click", loadStats);
+
+    async function shortenUrl() {
+
+        error.textContent = "";
+        statsResult.innerHTML = "";
+
+        const originalUrl = urlInput.value.trim();
+
+        if (!originalUrl) {
+            error.textContent = "Введите ссылку.";
+            return;
+        }
+
+        try {
+
+            const response = await fetch(API, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    originalUrl: originalUrl
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Ошибка создания короткой ссылки");
+            }
+
+            const data = await response.json();
+
+            /*
+                Ожидается ответ примерно такого вида:
+
+                {
+                    "id":1,
+                    "originalUrl":"https://example.com",
+                    "shortCode":"abc123",
+                    "shortUrl":"http://localhost:8080/abc123"
+                }
+            */
+
+            currentShortCode = data.shortCode;
+
+            const url = data.shortUrl ||
+                        ("http://localhost:8080/" + data.shortCode);
+
+            shortLink.href = url;
+            shortLink.textContent = url;
+
+            resultCard.classList.remove("hidden");
+
+        } catch (e) {
+            error.textContent = e.message;
+        }
+    }
+
+    async function loadStats() {
+
+        console.log("loadStats");
+        console.log(currentShortCode);
+
+        if (!currentShortCode)
+            return;
+
+        try {
+
+            const response = await fetch(
+                `${API}/${currentShortCode}/analytics`
+            );
+
+            if (!response.ok) {
+                throw new Error("Не удалось получить статистику");
+            }
+
+            const stats = await response.json();
+            console.log(stats);
+            console.log(JSON.stringify(stats));
+
+            /*
+                Любые поля, которые вернет API,
+                будут выведены автоматически.
+            */
+
+            statsResult.innerHTML = `
+                <div class="stats-card">
+                    <h3>📊 Статистика ссылки</h3>
+                    <p><strong>Количество переходов:</strong> ${stats.clicks}</p>
+                </div>
+`;
+
+        } catch (e) {
+            statsResult.innerHTML =
+                "<span style='color:red'>" +
+                e.message +
+                "</span>";
+        }
+
+    }
+
+</script>
+
+</body>
+</html>
