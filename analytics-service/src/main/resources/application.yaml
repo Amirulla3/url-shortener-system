@@ -43,3 +43,18 @@ logging:
   level:
     org.springframework.kafka: INFO
     org.hibernate.SQL: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+  endpoint:
+    health:
+      show-details: always
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true

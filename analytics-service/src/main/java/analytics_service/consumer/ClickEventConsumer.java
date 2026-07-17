@@ -4,6 +4,7 @@ import analytics_service.event.LinkClickedEvent;
 import analytics_service.service.AnalyticsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -20,9 +21,17 @@ public class ClickEventConsumer{
     )
     public void consume(LinkClickedEvent event){
 
-        log.info("Received event: {}", event);
+        try {
+            MDC.put("correlationId", event.correlationId());
 
-        service.process(event);
+            log.info(
+                    "Received click event. shortCode={}", event.shortCode()
+            );
 
+            service.process(event);
+
+        } finally {
+            MDC.clear();
+        }
     }
 }

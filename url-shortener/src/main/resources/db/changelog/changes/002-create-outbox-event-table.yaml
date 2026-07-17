@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-outbox-event-table
+      author: amir
+
+      changes:
+        - createTable:
+            tableName: outbox_event
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: event_type
+                  type: VARCHAR(100)
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: aggregate_id
+                  type: VARCHAR(100)
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: payload
+                  type: TEXT
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: sent_at
+                  type: TIMESTAMP
+
+        - createIndex:
+            tableName: outbox_event
+            indexName: idx_outbox_status
+
+            columns:
+              - column:
+                  name: status
+
+        - createIndex:
+            tableName: outbox_event
+            indexName: idx_outbox_created_at
+
+            columns:
+              - column:
+                  name: created_at
