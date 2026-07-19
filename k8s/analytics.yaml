@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: analytics-service
+
+  template:
+    metadata:
+      labels:
+        app: analytics-service
+
+    spec:
+      containers:
+        - name: analytics-service
+          image: url-shortener-analytics-service:latest
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 8081
+
+          envFrom:
+            - configMapRef:
+                name: analytics-config
+            - secretRef:
+                name: postgres-secret
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: /actuator/health
+              port: 8081
+            initialDelaySeconds: 40
+            periodSeconds: 15
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: analytics-service
+
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
