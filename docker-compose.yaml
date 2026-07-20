@@ -110,7 +110,7 @@ services:
 
   shortener-service:
     build:
-      context: ./shortener-service
+      context: ./url-shortener
       dockerfile: Dockerfile
 
     container_name: shortener-service
