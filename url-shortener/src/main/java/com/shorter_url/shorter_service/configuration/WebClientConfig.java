@@ -11,7 +11,7 @@ public class WebClientConfig {
     public WebClient webClient() {
 
         return WebClient.builder()
-                .baseUrl("http://localhost:8081")
+                .baseUrl("http://analytics-service:8081")
                 .build();
     }
 }

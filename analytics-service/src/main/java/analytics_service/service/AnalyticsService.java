@@ -35,7 +35,7 @@ public class AnalyticsService {
         repository.save(clickEvent);
 
         log.info(
-                "Processing click event. shortCode={}, correlationId={}",
+                "Click event saved. shortCode={}, correlationId={}",
                 event.shortCode(),
                 event.correlationId()
         );
