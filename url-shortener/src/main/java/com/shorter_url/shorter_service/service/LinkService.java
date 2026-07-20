@@ -70,7 +70,7 @@ public class LinkService {
 
         ShortLinkResponse shortLinkResponse = new ShortLinkResponse(
                 link.getShortCode(),
-                properties.getBaseUrl()+link.getShortCode()
+                properties.getBaseUrl() + "/" + link.getShortCode()
         );
 
         log.info("Short link successfully created");

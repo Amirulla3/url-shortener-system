@@ -158,7 +158,7 @@
 
 <script>
 
-    const API = "http://localhost:8080/api/links";
+    const API = "/api/links";
 
     const urlInput = document.getElementById("urlInput");
     const shortenBtn = document.getElementById("shortenBtn");
@@ -221,7 +221,7 @@
             currentShortCode = data.shortCode;
 
             const url = data.shortUrl ||
-                        ("http://localhost:8080/" + data.shortCode);
+                        (window.location.origin + "/" + data.shortCode);
 
             shortLink.href = url;
             shortLink.textContent = url;
