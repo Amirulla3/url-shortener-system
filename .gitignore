@@ -18,3 +18,8 @@
 # Temporary files
 *.tmp
 *.swp
+
+# Kubernetes Secrets
+k8s/postgres-secret.yaml
+k8s/shortener-secret.yaml
+k8s/analytics-secret.yaml

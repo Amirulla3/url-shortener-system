@@ -27,7 +27,6 @@ spec:
           env:
             - name: ZOOKEEPER_CLIENT_PORT
               value: "2181"
-
             - name: ZOOKEEPER_TICK_TIME
               value: "2000"
 
@@ -50,3 +49,19 @@ spec:
             limits:
               cpu: "250m"
               memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: zookeeper
+
+  ports:
+    - port: 2181
+      targetPort: 2181
