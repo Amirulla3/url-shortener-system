@@ -6,7 +6,7 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
-public class KafkaTopicKonfig {
+public class KafkaTopicConfig {
 
     @Bean
     public NewTopic linkClicksTopic(){

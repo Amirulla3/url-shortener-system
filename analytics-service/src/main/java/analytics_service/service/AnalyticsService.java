@@ -4,10 +4,11 @@ import analytics_service.DTO.StatisticsResponse;
 import analytics_service.entity.ClickEvent;
 import analytics_service.event.LinkClickedEvent;
 import analytics_service.repository.ClickEventRepository;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -20,7 +21,7 @@ public class AnalyticsService {
     public void process(LinkClickedEvent event){
 
         log.info(
-                "Processing click event. shortCode={}, correlationId={}",
+                "Received click event. shortCode={}, correlationId={}",
                 event.shortCode(),
                 event.correlationId()
         );
@@ -35,7 +36,7 @@ public class AnalyticsService {
         repository.save(clickEvent);
 
         log.info(
-                "Click event saved. shortCode={}, correlationId={}",
+                "Click event persisted. shortCode={}, correlationId={}",
                 event.shortCode(),
                 event.correlationId()
         );

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -40,7 +42,7 @@ public class OutboxPublisher {
                 LinkClickedEvent event = objectMapper
                         .readValue(outboxEvent.getPayload(), LinkClickedEvent.class);
 
-                kafkaTemplate.send("link-clicks", event).get();
+                kafkaTemplate.send("link-clicks", event).get(3, TimeUnit.SECONDS);
 
                 outboxEvent.setStatus(OutboxStatus.SENT);
                 outboxEvent.setSentAt(LocalDateTime.now());
@@ -50,6 +52,15 @@ public class OutboxPublisher {
                 log.info("Outbox event {} successfully published",
                         outboxEvent.getId()
                 );
+            }
+            catch (TimeoutException exception){
+
+                log.error(
+                        "Timeout while publishing outbox event {}",
+                        outboxEvent.getId(),
+                        exception
+                );
+
             }
             catch (JsonProcessingException exception){
 
@@ -61,9 +72,10 @@ public class OutboxPublisher {
             } catch (Exception e) {
 
                 log.error(
-                "Outbox event {} successfully published",
-                        outboxEvent.getId());
-
+                        "Failed to publish outbox event {}",
+                        outboxEvent.getId(),
+                        e
+                );
             }
         }
     }

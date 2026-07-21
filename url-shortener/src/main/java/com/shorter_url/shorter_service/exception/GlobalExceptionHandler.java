@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(LinkNotFoundException.class)
-    public ResponseEntity<String> handle(LinkExpiredException exception){
+    public ResponseEntity<String> handle(LinkNotFoundException exception){
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(exception.getMessage());

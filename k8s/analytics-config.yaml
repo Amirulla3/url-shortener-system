@@ -4,7 +4,7 @@ metadata:
   name: analytics-config
 
 data:
-  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-service:5432/analytics_db
-  SPRING_DATASOURCE_USERNAME: postgres
+  DB_URL: jdbc:postgresql://postgres-service:5432/analytics_db
+  DB_USERNAME: postgres
 
   KAFKA_BOOTSTRAP_SERVERS: kafka-service:9092

@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,32 +55,38 @@ public class LinkService {
         redirectsCounter = meterRegistry.counter("shortener_redirects_total");
     }
 
+    @Transactional
     public ShortLinkResponse createLink(CreateLinkRequest request){
 
         log.info("Starting short link creation");
 
-        Link link = new Link();
-        link.setOriginalUrl(request.originalUrl());
-        link.setShortCode(UUID.randomUUID().toString().substring(0, 6));
-        link.setCreatedAt(LocalDateTime.now());
-        link.setExpiresAt(LocalDateTime.now().plusDays(30));
-        link.setClicks(0L);
+        for (int i = 0; i < 5; i++) {
 
-        log.info("Saving link on database");
+            Link link = new Link();
+            link.setOriginalUrl(request.originalUrl());
+            link.setShortCode(UUID.randomUUID().toString().substring(0, 6));
+            link.setCreatedAt(LocalDateTime.now());
+            link.setExpiresAt(LocalDateTime.now().plusDays(30));
+            link.setClicks(0L);
 
-        repository.save(link);
+            try {
+                repository.save(link);
 
-        ShortLinkResponse shortLinkResponse = new ShortLinkResponse(
-                link.getShortCode(),
-                properties.getBaseUrl() + "/" + link.getShortCode()
-        );
+                createdLinksCounter.increment();
 
-        log.info("Short link successfully created");
+                log.info("Short link successfully created. shortCode={}", link.getShortCode());
 
-        createdLinksCounter.increment();
+                return new ShortLinkResponse(
+                        link.getShortCode(),
+                        properties.getBaseUrl() + "/" + link.getShortCode()
+                );
 
-        return shortLinkResponse;
+            } catch (DataIntegrityViolationException e) {
+                log.warn("Short code collision. Retrying...");
+            }
+        }
 
+        throw new RuntimeException("Failed to generate unique short code.");
     }
 
     @Transactional
@@ -115,7 +123,7 @@ public class LinkService {
             throw new RuntimeException("Failed to serialize LinkClickedEvent", exception);
         }
 
-        link.setClicks(link.getClicks() + 1L);
+        repository.incrementClicks(shortCode);
 
         outboxRepository.save(outboxEvent);
 
@@ -146,8 +154,7 @@ public class LinkService {
         return informationResponse;
     }
 
-    @Transactional(readOnly = true)
-    @CacheEvict(value = "links", key = "#shortCode")
+    @Transactional
     public void delete(String shortCode){
 
         Link link = repository.findByShortCode(shortCode)

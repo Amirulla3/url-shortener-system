@@ -1,5 +1,6 @@
 package com.shorter_url.shorter_service.configuration;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,7 +8,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
-
+@Slf4j
 @Configuration
 public class RedisConfig {
 
@@ -19,7 +20,7 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(
             RedisConnectionFactory connectionFactory) {
 
-        System.out.println(">>> RedisTemplate bean created");
+        log.debug("RedisConfig loaded");
 
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
@@ -32,7 +33,7 @@ public class RedisConfig {
     public CacheManager cacheManager(
             RedisConnectionFactory connectionFactory) {
 
-        System.out.println(">>> CacheManager bean created");
+        log.debug("RedisTemplate bean created");
 
         return RedisCacheManager.create(connectionFactory);
     }

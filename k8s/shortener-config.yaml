@@ -4,8 +4,8 @@ metadata:
   name: shortener-config
 
 data:
-  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-service:5432/shortener
-  SPRING_DATASOURCE_USERNAME: postgres
+  DB_URL: jdbc:postgresql://postgres-service:5432/shortener
+  DB_USERNAME: postgres
 
   REDIS_HOST: redis-service
   REDIS_PORT: "6379"

@@ -17,7 +17,7 @@ public class RateLimitService {
 
     public boolean isRateLimited(String ip){
 
-        String key = "rate_limit" + ip;
+        String key = "rate_limit:" + ip;
 
         Long count = redisTemplate.opsForValue().increment(key);
 
