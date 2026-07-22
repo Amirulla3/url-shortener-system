@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: ${SHORTENER_DB_URL}
+      POSTGRES_DB: ${SHORTENER_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: ${ANALYTICS_DB_URL}
+      POSTGRES_DB: ${ANALYTICS_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 

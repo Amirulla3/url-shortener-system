@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
 
+import java.time.Duration;
+
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -22,13 +25,13 @@ public class AnalyticsClient {
                     .uri("/api/analytics/{shortCode}/statistics", shortCode)
                     .retrieve()
                     .bodyToMono(StatisticsResponse.class)
+                    .timeout(Duration.ofSeconds(3))
                     .block();
-        } catch (WebClientException exception) {
+        } catch (Exception e) {
 
-            log.warn("Analytics service is unavailable");
+            log.warn("Failed to get statistics from analytics service", e);
 
             return new StatisticsResponse(0L);
-
         }
     }
 }

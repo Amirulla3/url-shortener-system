@@ -24,6 +24,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -39,7 +40,7 @@ public class LinkService {
     private Counter createdLinksCounter;
     private Counter redirectsCounter;
 
-    private final String LINK_NOT_FOUND = "Ссылка не найдена!";
+    private static final String LINK_NOT_FOUND = "Ссылка не найдена!";
 
     private final LinkRepository repository;
     private final AppProperties properties;
@@ -70,7 +71,8 @@ public class LinkService {
             link.setClicks(0L);
 
             try {
-                repository.save(link);
+
+                save(link);
 
                 createdLinksCounter.increment();
 
@@ -87,6 +89,11 @@ public class LinkService {
         }
 
         throw new RuntimeException("Failed to generate unique short code.");
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Link save(Link link) {
+        return repository.save(link);
     }
 
     @Transactional

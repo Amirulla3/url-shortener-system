@@ -36,7 +36,7 @@ public class RateLimitServiceTest {
         // given
         String ip = "192.168.1.1";
 
-        when(valueOperations.increment("rate_limit" + ip))
+        when(valueOperations.increment("rate_limit:" + ip))
                 .thenReturn(1L);
 
         // when
@@ -46,7 +46,7 @@ public class RateLimitServiceTest {
         assertFalse(result);
 
         verify(redisTemplate)
-                .expire("rate_limit" + ip, Duration.ofMinutes(1));
+                .expire("rate_limit:" + ip, Duration.ofMinutes(1));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class RateLimitServiceTest {
         // given
         String ip = "192.168.1.1";
 
-        when(valueOperations.increment("rate_limit" + ip))
+        when(valueOperations.increment("rate_limit:" + ip))
                 .thenReturn(11L);
 
         // when
@@ -72,7 +72,7 @@ public class RateLimitServiceTest {
         // given
         String ip = "192.168.1.1";
 
-        when(valueOperations.increment("rate_limit" + ip))
+        when(valueOperations.increment("rate_limit:" + ip))
                 .thenReturn(1L);
 
         // when
@@ -80,7 +80,7 @@ public class RateLimitServiceTest {
 
         // then
         verify(redisTemplate)
-                .expire("rate_limit" + ip, Duration.ofMinutes(1));
+                .expire("rate_limit:" + ip, Duration.ofMinutes(1));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class RateLimitServiceTest {
         // given
         String ip = "192.168.1.1";
 
-        when(valueOperations.increment("rate_limit" + ip))
+        when(valueOperations.increment("rate_limit:" + ip))
                 .thenReturn(2L);
 
         // when

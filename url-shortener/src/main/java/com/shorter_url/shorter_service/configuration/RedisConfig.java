@@ -13,14 +13,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisConfig {
 
     public RedisConfig() {
-        System.out.println(">>> RedisConfig loaded");
+
+        log.debug("RedisConfig loaded");
+
     }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(
             RedisConnectionFactory connectionFactory) {
 
-        log.debug("RedisConfig loaded");
+        log.debug("Creating RedisTemplate bean");
 
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
@@ -33,7 +35,7 @@ public class RedisConfig {
     public CacheManager cacheManager(
             RedisConnectionFactory connectionFactory) {
 
-        log.debug("RedisTemplate bean created");
+        log.debug("CacheManager bean created");
 
         return RedisCacheManager.create(connectionFactory);
     }
